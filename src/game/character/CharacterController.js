@@ -59,7 +59,7 @@ export class CharacterController {
   }
 
   update(dt, input, camYaw) {
-    const g = this.world.gravity || PHYSICS.gravity;
+    const g = this.world.gravity ?? PHYSICS.gravity;
     this.wasGrounded = this.grounded;
     this.justLanded = false;
     this.jumpBufferTimer = Math.max(0, this.jumpBufferTimer - dt);
