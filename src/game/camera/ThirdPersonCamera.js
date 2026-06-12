@@ -10,6 +10,8 @@ export class ThirdPersonCamera {
     this.pitch = 0.35;
     this.dist = 16;
     this._focus = new THREE.Vector3(0, 4, 0);
+    this._raycaster = new THREE.Raycaster();
+    this.obstacles = [];
 
     this._onMove = (e) => {
       if (document.pointerLockElement !== this.dom) return;
@@ -37,6 +39,10 @@ export class ThirdPersonCamera {
     if (document.pointerLockElement === this.dom) document.exitPointerLock?.();
   }
 
+  setObstacles(meshes) {
+    this.obstacles = meshes || [];
+  }
+
   setAspect(aspect) {
     this.camera.aspect = aspect;
     this.camera.updateProjectionMatrix();
@@ -53,7 +59,16 @@ export class ThirdPersonCamera {
       Math.cos(this.yaw) * cp
     ).multiplyScalar(this.dist);
 
-    const pos = this._focus.clone().add(offset);
+    // Obstruction handling: pull the camera in front of any blocking part
+    let dist = this.dist;
+    if (this.obstacles.length) {
+      const dir = offset.clone().normalize();
+      this._raycaster.set(this._focus, dir);
+      this._raycaster.far = this.dist;
+      const hit = this._raycaster.intersectObjects(this.obstacles, false)[0];
+      if (hit) dist = Math.max(2, hit.distance - 0.8);
+    }
+    const pos = this._focus.clone().add(offset.normalize().multiplyScalar(dist));
     if (pos.y < 0.6) pos.y = 0.6; // don't dip below the baseplate
     this.camera.position.copy(pos);
     this.camera.lookAt(this._focus);

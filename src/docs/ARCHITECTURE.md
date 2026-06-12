@@ -28,7 +28,7 @@ Player state record: `{ username, color, x, y, z, yaw, anim, health, deaths, las
 - The `NetworkClient` class is a swappable transport: a dedicated WebSocket server can implement the same handler interface (`onPlayers`, `onChat`, `onStatus`) without engine changes.
 
 ## World format
-`WorldConfig` entity (one record = the default world): name, baseplate_size, spawn_x/y/z, gravity, sky_top, sky_bottom, sun_intensity, ambient_intensity. Edited by `/editor`, loaded by `/play` on join, merged over `DEFAULT_WORLD` defaults.
+`WorldConfig` entity (one record = the default world): name, baseplate_size, spawn_x/y/z, gravity, sky_top, sky_bottom, sun_intensity, ambient_intensity, plus an optional 'parts' array of static boxes ({x,y,z,sx,sy,sz,color}) used for rendering, AABB collision and camera obstruction. Edited by `/editor`, loaded by `/play` on join, merged over `DEFAULT_WORLD` defaults.
 
 ## Scripting layer
 `scripts.on(event, fn)` — events: `onPlayerJoin`, `onPlayerLeave`, `onPlayerDeath`, `onPlayerRespawn`, `onTick`, `onChatMessage`. Handlers are try/catch sandboxed. No arbitrary user code execution.

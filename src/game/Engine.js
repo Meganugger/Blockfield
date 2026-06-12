@@ -2,6 +2,7 @@ import { PHYSICS, MAX_HEALTH, RESPAWN_DELAY_MS } from './config';
 import { ANIM } from './protocol';
 import { createScene } from './renderer/createScene';
 import { createBaseplate } from './world/Baseplate';
+import { createParts } from './world/Parts';
 import { createAvatar } from './character/Avatar';
 import { AnimationController } from './character/AnimationController';
 import { createNameplate } from './character/Nameplate';
@@ -33,6 +34,7 @@ export class Engine {
     this._disposeScene = dispose;
 
     createBaseplate(scene, this.world.baseplate_size);
+    const { meshes: partMeshes, colliders } = createParts(scene, this.world.parts);
 
     const avatar = createAvatar(this.identity.color);
     avatar.group.add(createNameplate(this.identity.username));
@@ -40,7 +42,7 @@ export class Engine {
     this.avatar = avatar;
     this.anim = new AnimationController(avatar.parts);
 
-    this.controller = new CharacterController(this.world);
+    this.controller = new CharacterController(this.world, colliders);
     this.controller.respawn();
 
     this.input = new InputManager();
@@ -48,6 +50,7 @@ export class Engine {
 
     this.camera = new ThirdPersonCamera(renderer.domElement);
     this.camera.attach();
+    this.camera.setObstacles(partMeshes);
 
     this._resize();
     this.resizeObs = new ResizeObserver(() => this._resize());
