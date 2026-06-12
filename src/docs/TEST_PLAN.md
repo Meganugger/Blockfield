@@ -12,3 +12,24 @@
 10. **Disconnect cleanup** — close one tab → within ~12s the other client's leaderboard row and avatar disappear. No duplicate rows after the same player rejoins.
 11. **Editor** — open `/editor`, change baseplate size / spawn height / sky colors / gravity, Save → rejoin `/play` and verify the world reflects the changes.
 12. **Resize** — resize the window during play → canvas and camera aspect adapt without distortion.
+
+## Physics / movement checklist (Roblox-like controller)
+
+- Spawn on baseplate; no sinking, no jitter while idle.
+- Walk W/A/S/D in all four directions; movement is camera-relative.
+- Diagonal movement (e.g. W+D) is NOT faster than straight movement.
+- Hold Shift: run speed engages; release: drops back to walk crisply.
+- Releasing all keys on ground: character stops quickly (strong braking), no ice-skating.
+- Jump from standing and while running: single strong impulse, heavy fall.
+- HOLD Space: exactly one jump fires; no auto-bunnyhop on landing (allowHeldJump=false).
+- Press Space ~0.1s BEFORE landing: buffered jump fires on touchdown.
+- Walk off a platform edge and press Space within ~0.1s: coyote jump fires.
+- Land on the demo parts (red/yellow/green) without jitter or bounce.
+- Walk into the side of a part: slide along it, no sticky jitter, no speed gain.
+- Walk onto a ledge lower than 1 stud: automatic step-up, no jump needed.
+- Jump under an overhang (build one in editor): head bump stops ascent cleanly.
+- Fall from the yellow part (8 studs): lands on baseplate, never tunnels through.
+- Fall into the void: death + respawn resets position, velocity, and all jump state.
+- Open chat with "/" mid-run: movement stops, held keys cleared, Space does not scroll page.
+- Camera follow + obstruction still work; pointer lock and zoom unchanged.
+- Second client: remote players still animate idle/walk/run/jump/fall correctly.
