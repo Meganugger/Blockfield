@@ -1,0 +1,53 @@
+{
+  "name": "Player",
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string",
+      "description": "Display name shown on nameplate and leaderboard"
+    },
+    "color": {
+      "type": "string",
+      "description": "Torso color hex"
+    },
+    "x": {
+      "type": "number"
+    },
+    "y": {
+      "type": "number"
+    },
+    "z": {
+      "type": "number"
+    },
+    "yaw": {
+      "type": "number"
+    },
+    "anim": {
+      "type": "string",
+      "enum": [
+        "idle",
+        "walk",
+        "run",
+        "jump",
+        "fall",
+        "dead"
+      ],
+      "default": "idle"
+    },
+    "health": {
+      "type": "number",
+      "default": 100
+    },
+    "deaths": {
+      "type": "number",
+      "default": 0
+    },
+    "last_seen": {
+      "type": "number",
+      "description": "Epoch ms heartbeat for presence pruning"
+    }
+  },
+  "required": [
+    "username"
+  ]
+}

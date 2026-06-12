@@ -1,0 +1,47 @@
+{
+  "name": "WorldConfig",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "default": "Baseplate"
+    },
+    "baseplate_size": {
+      "type": "number",
+      "default": 512
+    },
+    "spawn_x": {
+      "type": "number",
+      "default": 0
+    },
+    "spawn_y": {
+      "type": "number",
+      "default": 8
+    },
+    "spawn_z": {
+      "type": "number",
+      "default": 0
+    },
+    "gravity": {
+      "type": "number",
+      "default": 196.2
+    },
+    "sky_top": {
+      "type": "string",
+      "default": "#3aa7e8"
+    },
+    "sky_bottom": {
+      "type": "string",
+      "default": "#cfeaff"
+    },
+    "sun_intensity": {
+      "type": "number",
+      "default": 1.6
+    },
+    "ambient_intensity": {
+      "type": "number",
+      "default": 0.7
+    }
+  },
+  "required": []
+}

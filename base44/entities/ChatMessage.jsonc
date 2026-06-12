@@ -1,0 +1,17 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string",
+      "description": "Plain text, max 200 chars (enforced client-side too)"
+    }
+  },
+  "required": [
+    "username",
+    "text"
+  ]
+}
