@@ -27,6 +27,12 @@ export const DEFAULT_WORLD = {
   sky_bottom: '#cfeaff',
   sun_intensity: 1.6,
   ambient_intensity: 0.7,
+  // Static world parts: axis-aligned boxes players can stand on and collide with
+  parts: [
+    { x: 14, y: 2, z: 6, sx: 8, sy: 4, sz: 8, color: '#c84d3c' },
+    { x: 22, y: 4, z: 14, sx: 8, sy: 8, sz: 8, color: '#e8b431' },
+    { x: -16, y: 1.5, z: -10, sx: 12, sy: 3, sz: 6, color: '#1fae51' },
+  ],
 };
 
 export const MAX_HEALTH = 100;

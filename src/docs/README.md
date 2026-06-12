@@ -29,5 +29,4 @@ The app runs in the platform preview automatically. Routes:
 ## Known limitations
 - Replication runs over real-time data sync at ~4Hz with interpolation; a dedicated WebSocket server would allow 20–60Hz and server-authoritative physics.
 - Health/death is simulated client-side (void fall only); no damage sources yet.
-- No camera obstruction raycast (no obstacles exist yet besides the baseplate).
 - No mobile touch controls yet.
