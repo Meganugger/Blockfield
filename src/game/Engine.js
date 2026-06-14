@@ -11,6 +11,8 @@ import { ThirdPersonCamera } from './camera/ThirdPersonCamera';
 import { InputManager } from './input/InputManager';
 import { NetworkClient } from './net/NetworkClient';
 import { RemotePlayers } from './net/RemotePlayers';
+import { Collectibles } from './world/Collectibles';
+import { Backpack } from './gameplay/Backpack';
 import { scripts } from './scripting/GameScripts';
 
 // Engine orchestrator: fixed-timestep simulation (60Hz) decoupled from the
@@ -35,6 +37,11 @@ export class Engine {
 
     createBaseplate(scene, this.world.baseplate_size);
     const { meshes: partMeshes, colliders } = createParts(scene, this.world.parts);
+
+    this.collectibles = new Collectibles(scene, this.world.collectibles || []);
+    this.backpack = new Backpack(8, (slots) => this.events.onInventory?.(slots));
+    this._elapsed = 0;
+    this.events.onInventory?.(this.backpack.snapshot());
 
     const avatar = createAvatar(this.identity.color);
     avatar.group.add(createNameplate(this.identity.username));
@@ -143,6 +150,16 @@ export class Engine {
     this.camera.update(dt, c.pos);
     this.remotes.update(dt);
 
+    this._elapsed += dt;
+    this.collectibles.update(dt, this._elapsed);
+    if (!this.dead) {
+      const picked = this.collectibles.tryCollect(c.pos);
+      if (picked && this.backpack.add(picked)) {
+        this.events.onChat?.({ system: true, username: '', text: `Picked up ${picked.name}` });
+        scripts.emit('onPickup', picked);
+      }
+    }
+
     this.network.sendState({
       x: c.pos.x, y: c.pos.y, z: c.pos.z, yaw: c.yaw,
       anim: animState, health: this.health, deaths: this.deaths,
@@ -183,6 +200,7 @@ export class Engine {
     this.input?.detach();
     this.camera?.detach();
     this.remotes?.dispose();
+    this.collectibles?.dispose();
     this.network?.disconnect();
     scripts.emit('onPlayerLeave', { username: this.identity.username });
     this._disposeScene?.();

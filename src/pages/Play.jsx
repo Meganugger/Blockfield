@@ -7,6 +7,7 @@ import Hud from '@/components/game/Hud';
 import Leaderboard from '@/components/game/Leaderboard';
 import ChatPanel from '@/components/game/ChatPanel';
 import DeathScreen from '@/components/game/DeathScreen';
+import InventoryBar from '@/components/game/InventoryBar';
 
 export default function Play() {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export default function Play() {
   const [dead, setDead] = useState(false);
   const [status, setStatus] = useState('connecting');
   const [chatOpen, setChatOpen] = useState(false);
+  const [inventory, setInventory] = useState([]);
 
   const username = sessionStorage.getItem('bf_username');
   const color = sessionStorage.getItem('bf_color') || '#2a6dd0';
@@ -43,6 +45,7 @@ export default function Play() {
         onPlayers: setPlayers,
         onChat: (m) => setMessages((prev) => [...prev.slice(-49), m]),
         onStatus: setStatus,
+        onInventory: setInventory,
       });
       engineRef.current = engine;
       await engine.start();
@@ -99,6 +102,7 @@ export default function Play() {
         onSend={(text) => engineRef.current?.sendChat(text)}
       />
       <DeathScreen visible={dead} />
+      <InventoryBar slots={inventory} />
 
       <button
         onClick={() => navigate('/')}

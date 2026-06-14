@@ -58,6 +58,15 @@ export const DEFAULT_WORLD = {
     { x: 22, y: 4, z: 14, sx: 8, sy: 8, sz: 8, color: '#e8b431' },
     { x: -16, y: 1.5, z: -10, sx: 12, sy: 3, sz: 6, color: '#1fae51' },
   ],
+  // Pickup blocks scattered around the baseplate (walk into them to collect)
+  collectibles: [
+    { id: 'red_1', name: 'Red Block', color: '#e05a3a', x: 6, y: 0, z: 8 },
+    { id: 'blue_1', name: 'Blue Block', color: '#4ec0f0', x: -8, y: 0, z: 6 },
+    { id: 'green_1', name: 'Green Block', color: '#34d399', x: -16, y: 3, z: -10 },
+    { id: 'gold_1', name: 'Gold Block', color: '#f6c945', x: 22, y: 8, z: 14 },
+    { id: 'purple_1', name: 'Purple Block', color: '#8a4fd3', x: 0, y: 0, z: -14 },
+    { id: 'red_2', name: 'Red Block', color: '#e05a3a', x: 12, y: 0, z: -6 },
+  ],
 };
 
 export const MAX_HEALTH = 100;
