@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { DEFAULT_WORLD } from '@/game/config';
-import { ArrowLeft, Save, Check } from 'lucide-react';
+import { PRESETS } from '@/game/world/presets';
+import { ArrowLeft, Save, Check, Map } from 'lucide-react';
 
 const FIELDS = [
   { key: 'name', label: 'World name', type: 'text' },
@@ -30,6 +31,8 @@ export default function Editor() {
         setRecordId(list[0].id);
         const next = { ...DEFAULT_WORLD };
         for (const f of FIELDS) if (list[0][f.key] !== undefined) next[f.key] = list[0][f.key];
+        if (list[0].parts) next.parts = list[0].parts;
+        if (list[0].collectibles) next.collectibles = list[0].collectibles;
         setForm(next);
       }
     })();
@@ -41,6 +44,8 @@ export default function Editor() {
     for (const f of FIELDS) {
       payload[f.key] = f.type === 'number' ? Number(form[f.key]) || 0 : form[f.key];
     }
+    payload.parts = form.parts || [];
+    payload.collectibles = form.collectibles || [];
     if (recordId) await base44.entities.WorldConfig.update(recordId, payload);
     else {
       const rec = await base44.entities.WorldConfig.create(payload);
@@ -52,6 +57,8 @@ export default function Editor() {
   };
 
   const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const loadPreset = (preset) => setForm((prev) => ({ ...prev, ...preset }));
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0b1530] to-[#13294f] px-6 py-12">
@@ -65,6 +72,24 @@ export default function Editor() {
         </p>
 
         <div className="rounded-3xl bg-white/[0.06] backdrop-blur-xl border border-white/10 p-8 space-y-5">
+          <div className="rounded-2xl bg-black/20 border border-white/10 p-4 space-y-3">
+            <p className="text-xs uppercase tracking-wide text-sky-100/40 font-semibold">Map presets</p>
+            <div className="flex flex-wrap gap-2">
+              {PRESETS.map((p) => (
+                <button
+                  key={p.name}
+                  onClick={() => loadPreset(p)}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-sky-400/15 hover:bg-sky-400/25 border border-sky-400/30 text-sky-100 text-sm transition-colors"
+                >
+                  <Map className="w-4 h-4" /> Load {p.name}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-sky-100/40">
+              {(form.parts?.length || 0)} obstacle{(form.parts?.length || 0) === 1 ? '' : 's'} loaded. Save to apply for the next session.
+            </p>
+          </div>
+
           {FIELDS.map((f) => (
             <div key={f.key} className="flex items-center justify-between gap-4">
               <label className="text-sm text-sky-100/70">{f.label}</label>

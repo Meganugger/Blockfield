@@ -41,6 +41,63 @@
     "ambient_intensity": {
       "type": "number",
       "default": 0.7
+    },
+    "parts": {
+      "type": "array",
+      "description": "Static collidable boxes in the world",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          },
+          "sx": {
+            "type": "number"
+          },
+          "sy": {
+            "type": "number"
+          },
+          "sz": {
+            "type": "number"
+          },
+          "color": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "collectibles": {
+      "type": "array",
+      "description": "Pickup blocks scattered in the world",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          }
+        }
+      }
     }
   },
   "required": []
