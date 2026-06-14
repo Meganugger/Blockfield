@@ -7,6 +7,7 @@ import * as THREE from 'three';
 // a server-authoritative item registry can replace this later.
 
 const PICKUP_RADIUS = 2.6; // distance from player feet that triggers a pickup
+const NEARBY_RADIUS = 5; // distance at which the pickup prompt appears
 
 export class Collectibles {
   constructor(scene, defs = []) {
@@ -43,6 +44,24 @@ export class Collectibles {
       it.mesh.rotation.y += dt * 1.6;
       it.mesh.position.y = it.baseY + Math.sin(elapsed * 2 + it.phase) * 0.25;
     }
+  }
+
+  // Closest un-collected item within NEARBY_RADIUS (for the proximity prompt), else null.
+  findNearest(pos) {
+    let best = null;
+    let bestDist = NEARBY_RADIUS * NEARBY_RADIUS;
+    for (const it of this.items) {
+      if (it.collected) continue;
+      const dx = it.mesh.position.x - pos.x;
+      const dz = it.mesh.position.z - pos.z;
+      const dy = it.mesh.position.y - (pos.y + 2);
+      const d2 = dx * dx + dz * dz + dy * dy;
+      if (d2 <= bestDist) {
+        bestDist = d2;
+        best = { id: it.id, name: it.name, color: it.color };
+      }
+    }
+    return best;
   }
 
   tryCollect(pos) {

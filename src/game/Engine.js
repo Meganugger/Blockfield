@@ -41,6 +41,7 @@ export class Engine {
     this.collectibles = new Collectibles(scene, this.world.collectibles || []);
     this.backpack = new Backpack(8, (slots) => this.events.onInventory?.(slots));
     this._elapsed = 0;
+    this._nearbyId = null;
     this.events.onInventory?.(this.backpack.snapshot());
 
     const avatar = createAvatar(this.identity.color);
@@ -158,6 +159,15 @@ export class Engine {
         this.events.onChat?.({ system: true, username: '', text: `Picked up ${picked.name}` });
         scripts.emit('onPickup', picked);
       }
+      const nearby = this.collectibles.findNearest(c.pos);
+      const nearbyId = nearby?.id || null;
+      if (nearbyId !== this._nearbyId) {
+        this._nearbyId = nearbyId;
+        this.events.onNearby?.(nearby);
+      }
+    } else if (this._nearbyId) {
+      this._nearbyId = null;
+      this.events.onNearby?.(null);
     }
 
     this.network.sendState({
