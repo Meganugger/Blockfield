@@ -121,10 +121,8 @@ export class Engine {
     if (this._equippedIndex < 0) return;
     const removed = this.backpack.removeOne(this._equippedIndex);
     if (!removed) return;
-    // Place it slightly in front of the player so it doesn't overlap the body.
-    const fx = c.pos.x + Math.sin(c.yaw) * 2;
-    const fz = c.pos.z + Math.cos(c.yaw) * 2;
-    this.collectibles.spawn({ name: removed.name, color: removed.color, x: fx, y: c.pos.y, z: fz });
+    // Spawn it as a collectible at the player's current feet position.
+    this.collectibles.spawn({ name: removed.name, color: removed.color, x: c.pos.x, y: c.pos.y, z: c.pos.z });
     this.events.onChat?.({ system: true, username: '', text: `Dropped ${removed.name}` });
     // removeOne emits a change -> _onInventoryChanged clears the held item if the slot is now empty.
   }
