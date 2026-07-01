@@ -132,6 +132,7 @@ export class Engine {
   _refreshHeld(slots = this.backpack.snapshot()) {
     const item = this._equippedIndex >= 0 ? slots[this._equippedIndex] : null;
     this.held?.set(item ? { name: item.name, color: item.color } : null);
+    this.anim?.setEquipped(!!item);
   }
 
   _onInventoryChanged(slots) {

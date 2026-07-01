@@ -10,6 +10,11 @@ export class AnimationController {
     this.p = parts;
     this.t = Math.random() * 10; // de-sync players
     this.state = ANIM.IDLE;
+    this.equipped = false; // right arm holds an item forward when true
+  }
+
+  setEquipped(on) {
+    this.equipped = on;
   }
 
   setState(state) {
@@ -47,6 +52,12 @@ export class AnimationController {
         la = s; ra = -s;
         bob = Math.sin(t * 2) * 0.02;
       }
+    }
+
+    // While holding an item, raise the right arm into a presenting pose so the
+    // held block is clearly visible in front of the character.
+    if (this.equipped && this.state !== ANIM.DEAD) {
+      ra = -1.15 + Math.sin(t * 2) * 0.05;
     }
 
     const k = Math.min(1, 14 * dt);

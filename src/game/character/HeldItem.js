@@ -22,7 +22,7 @@ export class HeldItem {
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), mat);
     mesh.castShadow = true;
     // Position at the hand end of the arm (arm hangs down to y ~= -2 in pivot space).
-    mesh.position.set(0, -2, 0.55);
+    mesh.position.set(0, -2, 0.75);
     this.handPivot.add(mesh);
     this.mesh = mesh;
   }
