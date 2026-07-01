@@ -129,14 +129,11 @@ export class Engine {
     // removeOne emits a change -> _onInventoryChanged clears the held item if the slot is now empty.
   }
 
-  _toggleEquip(index) {
+  _equipSlot(index) {
     const slots = this.backpack.snapshot();
-    // Toggle off if re-selecting the same slot; ignore empty slots.
-    if (index === this._equippedIndex || !slots[index]) {
-      this._equippedIndex = -1;
-    } else {
-      this._equippedIndex = index;
-    }
+    // Directly equip the item in this slot; ignore empty slots and re-presses.
+    if (!slots[index] || index === this._equippedIndex) return;
+    this._equippedIndex = index;
     this._refreshHeld(slots);
     this.events.onEquip?.(this._equippedIndex);
   }
@@ -203,9 +200,9 @@ export class Engine {
         this._nearbyId = nearbyId;
         this.events.onNearby?.(nearby);
       }
-      // Equip / unequip an inventory slot with number keys 1-8.
+      // Instantly equip an inventory slot with number keys 1-8.
       const slot = this.input.consumeSlotPressed();
-      if (slot >= 0) this._toggleEquip(slot);
+      if (slot >= 0) this._equipSlot(slot);
 
       // Drop (Q) the equipped item back into the world at the player's position.
       if (this.input.consumeDropPressed()) this._dropEquipped(c);
