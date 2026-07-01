@@ -33,6 +33,9 @@ export const PHYSICS = {
 
   // --- feel polish ---
   landingLockTime: 0.08, // brief just-landed window (animation/feel hook)
+
+  // --- jump pads ---
+  jumpPadVelocity: 90, // default upward launch when landing on a jump-pad part (~1.8x a normal jump)
 };
 
 export const NET = {

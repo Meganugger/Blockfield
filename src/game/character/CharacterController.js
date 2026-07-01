@@ -244,16 +244,27 @@ export class CharacterController {
     this.grounded = false;
     if (this.vel.y <= 0) {
       let landY = -Infinity;
+      let landPad = 0; // jump-pad boost of the surface we land on (0 = normal)
       const half = (this.world.baseplate_size || 512) / 2;
       if (Math.abs(this.pos.x) <= half && Math.abs(this.pos.z) <= half && prevY >= -1e-4 && this.pos.y <= 0) landY = 0;
       for (const c of this.colliders) {
         if (!this._overlapsXZ(c, this.pos.x, this.pos.z)) continue;
-        if (prevY >= c.maxY - 1e-4 && this.pos.y < c.maxY && c.maxY > landY) landY = c.maxY;
+        if (prevY >= c.maxY - 1e-4 && this.pos.y < c.maxY && c.maxY > landY) {
+          landY = c.maxY;
+          landPad = c.jump || 0;
+        }
       }
       if (landY > -Infinity) {
         this.pos.y = landY;
-        this.vel.y = 0;
-        this.grounded = true;
+        if (landPad > 0) {
+          // Jump pad: bounce the player up instead of stopping.
+          this.vel.y = landPad;
+          this.grounded = false;
+          this.timeSinceGrounded = PHYSICS.coyoteTime;
+        } else {
+          this.vel.y = 0;
+          this.grounded = true;
+        }
       }
     } else {
       for (const c of this.colliders) {
