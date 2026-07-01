@@ -5,6 +5,7 @@ import { DEFAULT_WORLD } from '@/game/config';
 import { ArrowLeft, Save, Check } from 'lucide-react';
 import CollectiblePlacer from '@/components/editor/CollectiblePlacer';
 import JumpPadPlacer from '@/components/editor/JumpPadPlacer';
+import ObstacleCoursePicker from '@/components/editor/ObstacleCoursePicker';
 
 const FIELDS = [
   { key: 'name', label: 'World name', type: 'text' },
@@ -62,6 +63,11 @@ export default function Editor() {
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const loadCourse = (course) => {
+    if (Array.isArray(course.parts) && course.parts.length) setParts((prev) => [...prev, ...course.parts]);
+    if (Array.isArray(course.pads) && course.pads.length) setPads((prev) => [...prev, ...course.pads]);
+  };
+
   const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
   return (
@@ -114,6 +120,10 @@ export default function Editor() {
 
         <div className="mt-6">
           <JumpPadPlacer pads={pads} onChange={setPads} />
+        </div>
+
+        <div className="mt-6">
+          <ObstacleCoursePicker onLoad={loadCourse} />
         </div>
       </div>
     </div>
