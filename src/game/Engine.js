@@ -154,16 +154,21 @@ export class Engine {
     this._elapsed += dt;
     this.collectibles.update(dt, this._elapsed);
     if (!this.dead) {
-      const picked = this.collectibles.tryCollect(c.pos);
-      if (picked && this.backpack.add(picked)) {
-        this.events.onChat?.({ system: true, username: '', text: `Picked up ${picked.name}` });
-        scripts.emit('onPickup', picked);
-      }
       const nearby = this.collectibles.findNearest(c.pos);
       const nearbyId = nearby?.id || null;
       if (nearbyId !== this._nearbyId) {
         this._nearbyId = nearbyId;
         this.events.onNearby?.(nearby);
+      }
+      // Interact (E) to pick up the nearest block: it leaves the map and enters the backpack.
+      if (nearbyId && this.input.consumeInteractPressed()) {
+        const picked = this.collectibles.collect(nearbyId);
+        if (picked && this.backpack.add(picked)) {
+          this.events.onChat?.({ system: true, username: '', text: `Picked up ${picked.name}` });
+          scripts.emit('onPickup', picked);
+          this._nearbyId = null;
+          this.events.onNearby?.(null);
+        }
       }
     } else if (this._nearbyId) {
       this._nearbyId = null;

@@ -1,8 +1,8 @@
 import React from 'react';
 
 // Proximity interaction label. Appears just above the inventory bar when the
-// character is near a collectible. Walking into the block auto-collects it, so
-// this is a lightweight hint rather than a key-press gate.
+// character is near a collectible. Press E to pick the block up -- it leaves
+// the map and appears in the inventory hotbar.
 export default function PickupPrompt({ block }) {
   if (!block) return null;
   return (
@@ -12,7 +12,8 @@ export default function PickupPrompt({ block }) {
           className="w-3.5 h-3.5 rounded-sm"
           style={{ background: block.color, boxShadow: `0 0 8px ${block.color}aa` }}
         />
-        <span className="text-white text-sm font-medium whitespace-nowrap">
+        <span className="text-white text-sm font-medium whitespace-nowrap flex items-center gap-1.5">
+          <kbd className="px-1.5 py-0.5 rounded bg-white/15 border border-white/25 text-xs font-bold leading-none">E</kbd>
           Pick up <span className="font-bold">{block.name}</span>
         </span>
       </div>

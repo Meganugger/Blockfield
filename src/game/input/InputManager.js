@@ -8,12 +8,14 @@ export class InputManager {
     this.enabled = true;
     this._jumpPressed = false;
     this._jumpReleased = false;
+    this._interactPressed = false;
     this._down = (e) => {
       if (!this.enabled) return;
       if (e.code === 'Space') {
         e.preventDefault(); // stop browser page scroll
         if (!e.repeat && !this.keys.has('Space')) this._jumpPressed = true;
       }
+      if (e.code === 'KeyE' && !e.repeat && !this.keys.has('KeyE')) this._interactPressed = true;
       this.keys.add(e.code);
     };
     this._up = (e) => {
@@ -27,6 +29,7 @@ export class InputManager {
     this.keys.clear();
     this._jumpPressed = false;
     this._jumpReleased = false;
+    this._interactPressed = false;
   }
 
   attach() {
@@ -59,6 +62,14 @@ export class InputManager {
     const r = this._jumpReleased;
     this._jumpReleased = false;
     return r;
+  }
+
+  /** One-frame interact (E) press edge; consumed on read. */
+  consumeInteractPressed() {
+    if (!this.enabled) return false;
+    const p = this._interactPressed;
+    this._interactPressed = false;
+    return p;
   }
 
   /** Space currently held. */

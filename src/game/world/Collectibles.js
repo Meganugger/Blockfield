@@ -2,11 +2,10 @@ import * as THREE from 'three';
 
 // Pickup blocks the player can collect. Each spawns a small, floating,
 // spinning, slightly glowing cube. The class owns the meshes/animation and
-// exposes tryCollect(playerPos) which returns the item that was just picked up
-// (or null), removing its mesh from the scene. Purely client-local for now --
+// exposes findNearest(pos) for the prompt and collect(id) which the player
+// triggers with the interact key, removing its mesh from the scene. Client-local for now --
 // a server-authoritative item registry can replace this later.
 
-const PICKUP_RADIUS = 2.6; // distance from player feet that triggers a pickup
 const NEARBY_RADIUS = 5; // distance at which the pickup prompt appears
 
 export class Collectibles {
@@ -64,19 +63,16 @@ export class Collectibles {
     return best;
   }
 
-  tryCollect(pos) {
+  // Collect a specific item by id (triggered by the player's interact key).
+  // Removes its mesh from the scene and returns the item, or null if not found.
+  collect(id) {
     for (const it of this.items) {
-      if (it.collected) continue;
-      const dx = it.mesh.position.x - pos.x;
-      const dz = it.mesh.position.z - pos.z;
-      const dy = it.mesh.position.y - (pos.y + 2);
-      if (dx * dx + dz * dz + dy * dy <= PICKUP_RADIUS * PICKUP_RADIUS) {
-        it.collected = true;
-        this.scene.remove(it.mesh);
-        it.mesh.geometry.dispose();
-        it.mesh.material.dispose();
-        return { id: it.id, name: it.name, color: it.color };
-      }
+      if (it.collected || it.id !== id) continue;
+      it.collected = true;
+      this.scene.remove(it.mesh);
+      it.mesh.geometry.dispose();
+      it.mesh.material.dispose();
+      return { id: it.id, name: it.name, color: it.color };
     }
     return null;
   }
