@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { DEFAULT_WORLD } from '@/game/config';
 import { ArrowLeft, Save, Check } from 'lucide-react';
 import CollectiblePlacer from '@/components/editor/CollectiblePlacer';
+import JumpPadPlacer from '@/components/editor/JumpPadPlacer';
 
 const FIELDS = [
   { key: 'name', label: 'World name', type: 'text' },
@@ -23,6 +24,7 @@ export default function Editor() {
   const [form, setForm] = useState(DEFAULT_WORLD);
   const [collectibles, setCollectibles] = useState([]);
   const [parts, setParts] = useState([]);
+  const [pads, setPads] = useState([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -35,7 +37,9 @@ export default function Editor() {
         for (const f of FIELDS) if (list[0][f.key] !== undefined) next[f.key] = list[0][f.key];
         setForm(next);
         setCollectibles(Array.isArray(list[0].collectibles) ? list[0].collectibles : []);
-        setParts(Array.isArray(list[0].parts) ? list[0].parts : []);
+        const allParts = Array.isArray(list[0].parts) ? list[0].parts : [];
+        setParts(allParts.filter((p) => !p.jump));
+        setPads(allParts.filter((p) => p.jump));
       }
     })();
   }, []);
@@ -47,7 +51,7 @@ export default function Editor() {
       payload[f.key] = f.type === 'number' ? Number(form[f.key]) || 0 : form[f.key];
     }
     payload.collectibles = collectibles;
-    payload.parts = parts;
+    payload.parts = [...parts.filter((p) => !p.jump), ...pads];
     if (recordId) await base44.entities.WorldConfig.update(recordId, payload);
     else {
       const rec = await base44.entities.WorldConfig.create(payload);
@@ -106,6 +110,10 @@ export default function Editor() {
 
         <div className="mt-6">
           <CollectiblePlacer collectibles={collectibles} onChange={setCollectibles} />
+        </div>
+
+        <div className="mt-6">
+          <JumpPadPlacer pads={pads} onChange={setPads} />
         </div>
       </div>
     </div>
