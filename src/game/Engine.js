@@ -117,6 +117,18 @@ export class Engine {
     return this.network.sendChat(text);
   }
 
+  _dropEquipped(c) {
+    if (this._equippedIndex < 0) return;
+    const removed = this.backpack.removeOne(this._equippedIndex);
+    if (!removed) return;
+    // Place it slightly in front of the player so it doesn't overlap the body.
+    const fx = c.pos.x + Math.sin(c.yaw) * 2;
+    const fz = c.pos.z + Math.cos(c.yaw) * 2;
+    this.collectibles.spawn({ name: removed.name, color: removed.color, x: fx, y: c.pos.y, z: fz });
+    this.events.onChat?.({ system: true, username: '', text: `Dropped ${removed.name}` });
+    // removeOne emits a change -> _onInventoryChanged clears the held item if the slot is now empty.
+  }
+
   _toggleEquip(index) {
     const slots = this.backpack.snapshot();
     // Toggle off if re-selecting the same slot; ignore empty slots.
@@ -194,6 +206,9 @@ export class Engine {
       // Equip / unequip an inventory slot with number keys 1-8.
       const slot = this.input.consumeSlotPressed();
       if (slot >= 0) this._toggleEquip(slot);
+
+      // Drop (Q) the equipped item back into the world at the player's position.
+      if (this.input.consumeDropPressed()) this._dropEquipped(c);
 
       // Interact (E) to pick up the nearest block: it leaves the map and enters the backpack.
       if (nearbyId && this.input.consumeInteractPressed()) {

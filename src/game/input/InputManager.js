@@ -9,6 +9,7 @@ export class InputManager {
     this._jumpPressed = false;
     this._jumpReleased = false;
     this._interactPressed = false;
+    this._dropPressed = false;
     this._slotPressed = -1; // 0-based inventory slot requested this frame, or -1
     this._down = (e) => {
       if (!this.enabled) return;
@@ -17,6 +18,7 @@ export class InputManager {
         if (!e.repeat && !this.keys.has('Space')) this._jumpPressed = true;
       }
       if (e.code === 'KeyE' && !e.repeat && !this.keys.has('KeyE')) this._interactPressed = true;
+      if (e.code === 'KeyQ' && !e.repeat && !this.keys.has('KeyQ')) this._dropPressed = true;
       if (!e.repeat && /^Digit[1-8]$/.test(e.code) && !this.keys.has(e.code)) {
         this._slotPressed = Number(e.code.slice(5)) - 1;
       }
@@ -34,6 +36,7 @@ export class InputManager {
     this._jumpPressed = false;
     this._jumpReleased = false;
     this._interactPressed = false;
+    this._dropPressed = false;
     this._slotPressed = -1;
   }
 
@@ -74,6 +77,14 @@ export class InputManager {
     if (!this.enabled) return false;
     const p = this._interactPressed;
     this._interactPressed = false;
+    return p;
+  }
+
+  /** One-frame drop (Q) press edge; consumed on read. */
+  consumeDropPressed() {
+    if (!this.enabled) return false;
+    const p = this._dropPressed;
+    this._dropPressed = false;
     return p;
   }
 

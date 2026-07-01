@@ -22,6 +22,18 @@ export class Backpack {
     return true;
   }
 
+  // Remove one unit from the stack at slot `index`; drops the stack when it hits
+  // zero. Returns the removed block descriptor, or null if the slot was empty.
+  removeOne(index) {
+    const it = this.items[index];
+    if (!it) return null;
+    const block = { name: it.name, color: it.color };
+    it.count -= 1;
+    if (it.count <= 0) this.items.splice(index, 1);
+    this._emit();
+    return block;
+  }
+
   _emit() {
     this.onChange?.(this.snapshot());
   }

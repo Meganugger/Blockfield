@@ -37,6 +37,31 @@ export class Collectibles {
     }
   }
 
+  // Spawn a new pickup at runtime (e.g. an item the player drops from the backpack).
+  spawn(def) {
+    const size = def.size || 1;
+    const mat = new THREE.MeshStandardMaterial({
+      color: def.color || '#4ec0f0',
+      emissive: new THREE.Color(def.color || '#4ec0f0'),
+      emissiveIntensity: 0.35,
+      roughness: 0.3,
+      metalness: 0.1,
+    });
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), mat);
+    mesh.castShadow = true;
+    mesh.position.set(def.x || 0, (def.y ?? 1) + 0.5, def.z || 0);
+    this.scene.add(mesh);
+    this.items.push({
+      id: def.id || `drop_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+      name: def.name || 'Block',
+      color: def.color || '#4ec0f0',
+      mesh,
+      baseY: mesh.position.y,
+      collected: false,
+      phase: Math.random() * Math.PI * 2,
+    });
+  }
+
   update(dt, elapsed) {
     for (const it of this.items) {
       if (it.collected) continue;
