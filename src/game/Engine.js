@@ -249,6 +249,7 @@ export class Engine {
     this.input?.detach();
     this.camera?.detach();
     this.remotes?.dispose();
+    this.held?.dispose();
     this.collectibles?.dispose();
     this.network?.disconnect();
     scripts.emit('onPlayerLeave', { username: this.identity.username });
