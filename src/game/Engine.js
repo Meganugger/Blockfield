@@ -13,6 +13,7 @@ import { NetworkClient } from './net/NetworkClient';
 import { RemotePlayers } from './net/RemotePlayers';
 import { Collectibles } from './world/Collectibles';
 import { Backpack } from './gameplay/Backpack';
+import { HeldItem } from './character/HeldItem';
 import { scripts } from './scripting/GameScripts';
 
 // Engine orchestrator: fixed-timestep simulation (60Hz) decoupled from the
@@ -39,9 +40,10 @@ export class Engine {
     const { meshes: partMeshes, colliders } = createParts(scene, this.world.parts);
 
     this.collectibles = new Collectibles(scene, this.world.collectibles || []);
-    this.backpack = new Backpack(8, (slots) => this.events.onInventory?.(slots));
+    this.backpack = new Backpack(8, (slots) => this._onInventoryChanged(slots));
     this._elapsed = 0;
     this._nearbyId = null;
+    this._equippedIndex = -1;
     this.events.onInventory?.(this.backpack.snapshot());
 
     const avatar = createAvatar(this.identity.color);
@@ -49,6 +51,7 @@ export class Engine {
     scene.add(avatar.group);
     this.avatar = avatar;
     this.anim = new AnimationController(avatar.parts);
+    this.held = new HeldItem(avatar.parts.rightArm);
 
     this.controller = new CharacterController(this.world, colliders);
     this.controller.respawn();
@@ -114,6 +117,33 @@ export class Engine {
     return this.network.sendChat(text);
   }
 
+  _toggleEquip(index) {
+    const slots = this.backpack.snapshot();
+    // Toggle off if re-selecting the same slot; ignore empty slots.
+    if (index === this._equippedIndex || !slots[index]) {
+      this._equippedIndex = -1;
+    } else {
+      this._equippedIndex = index;
+    }
+    this._refreshHeld(slots);
+    this.events.onEquip?.(this._equippedIndex);
+  }
+
+  _refreshHeld(slots = this.backpack.snapshot()) {
+    const item = this._equippedIndex >= 0 ? slots[this._equippedIndex] : null;
+    this.held?.set(item ? { name: item.name, color: item.color } : null);
+  }
+
+  _onInventoryChanged(slots) {
+    this.events.onInventory?.(slots);
+    // If the equipped slot became empty, drop the held item.
+    if (this._equippedIndex >= 0 && !slots[this._equippedIndex]) {
+      this._equippedIndex = -1;
+      this.events.onEquip?.(-1);
+    }
+    this._refreshHeld(slots);
+  }
+
   _loop() {
     const step = 1 / 60;
     let last = performance.now();
@@ -160,6 +190,10 @@ export class Engine {
         this._nearbyId = nearbyId;
         this.events.onNearby?.(nearby);
       }
+      // Equip / unequip an inventory slot with number keys 1-8.
+      const slot = this.input.consumeSlotPressed();
+      if (slot >= 0) this._toggleEquip(slot);
+
       // Interact (E) to pick up the nearest block: it leaves the map and enters the backpack.
       if (nearbyId && this.input.consumeInteractPressed()) {
         const picked = this.collectibles.collect(nearbyId);

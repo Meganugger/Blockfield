@@ -24,6 +24,7 @@ export default function Play() {
   const [chatOpen, setChatOpen] = useState(false);
   const [inventory, setInventory] = useState([]);
   const [nearbyBlock, setNearbyBlock] = useState(null);
+  const [equippedIndex, setEquippedIndex] = useState(-1);
 
   const username = sessionStorage.getItem('bf_username');
   const color = sessionStorage.getItem('bf_color') || '#2a6dd0';
@@ -49,6 +50,7 @@ export default function Play() {
         onStatus: setStatus,
         onInventory: setInventory,
         onNearby: setNearbyBlock,
+        onEquip: setEquippedIndex,
       });
       engineRef.current = engine;
       await engine.start();
@@ -106,7 +108,7 @@ export default function Play() {
       />
       <DeathScreen visible={dead} />
       <PickupPrompt block={nearbyBlock} />
-      <InventoryBar slots={inventory} />
+      <InventoryBar slots={inventory} equippedIndex={equippedIndex} />
 
       <button
         onClick={() => navigate('/')}
