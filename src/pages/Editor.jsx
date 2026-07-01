@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { DEFAULT_WORLD } from '@/game/config';
 import { ArrowLeft, Save, Check } from 'lucide-react';
+import CollectiblePlacer from '@/components/editor/CollectiblePlacer';
 
 const FIELDS = [
   { key: 'name', label: 'World name', type: 'text' },
@@ -20,6 +21,8 @@ const FIELDS = [
 export default function Editor() {
   const [recordId, setRecordId] = useState(null);
   const [form, setForm] = useState(DEFAULT_WORLD);
+  const [collectibles, setCollectibles] = useState([]);
+  const [parts, setParts] = useState([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -31,6 +34,8 @@ export default function Editor() {
         const next = { ...DEFAULT_WORLD };
         for (const f of FIELDS) if (list[0][f.key] !== undefined) next[f.key] = list[0][f.key];
         setForm(next);
+        setCollectibles(Array.isArray(list[0].collectibles) ? list[0].collectibles : []);
+        setParts(Array.isArray(list[0].parts) ? list[0].parts : []);
       }
     })();
   }, []);
@@ -41,6 +46,8 @@ export default function Editor() {
     for (const f of FIELDS) {
       payload[f.key] = f.type === 'number' ? Number(form[f.key]) || 0 : form[f.key];
     }
+    payload.collectibles = collectibles;
+    payload.parts = parts;
     if (recordId) await base44.entities.WorldConfig.update(recordId, payload);
     else {
       const rec = await base44.entities.WorldConfig.create(payload);
@@ -95,6 +102,10 @@ export default function Editor() {
             {saved ? <Check className="w-5 h-5" /> : <Save className="w-5 h-5" />}
             {saved ? 'Saved' : saving ? 'Saving…' : 'Save World'}
           </button>
+        </div>
+
+        <div className="mt-6">
+          <CollectiblePlacer collectibles={collectibles} onChange={setCollectibles} />
         </div>
       </div>
     </div>
