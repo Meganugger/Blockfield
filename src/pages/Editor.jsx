@@ -6,6 +6,7 @@ import { ArrowLeft, Save, Check } from 'lucide-react';
 import CollectiblePlacer from '@/components/editor/CollectiblePlacer';
 import JumpPadPlacer from '@/components/editor/JumpPadPlacer';
 import ObstacleCoursePicker from '@/components/editor/ObstacleCoursePicker';
+import ToolIndicator from '@/components/editor/ToolIndicator';
 import QuickLoadMenu from '@/components/editor/QuickLoadMenu';
 
 const FIELDS = [
@@ -29,6 +30,7 @@ export default function Editor() {
   const [pads, setPads] = useState([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [activeTool, setActiveTool] = useState(null);
   const [applyingId, setApplyingId] = useState(null);
   const [appliedId, setAppliedId] = useState(null);
 
@@ -97,7 +99,10 @@ export default function Editor() {
   const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0b1530] to-[#13294f] px-6 py-12">
+    <div
+      className="min-h-screen bg-gradient-to-b from-[#0b1530] to-[#13294f] px-6 py-12"
+      style={{ cursor: activeTool === 'collectible' ? 'crosshair' : activeTool === 'jumppad' ? 'cell' : 'auto' }}
+    >
       <div className="max-w-xl mx-auto">
         <Link to="/" className="inline-flex items-center gap-1.5 text-sky-100/50 hover:text-white text-sm mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to launcher
@@ -106,6 +111,10 @@ export default function Editor() {
         <p className="text-sky-100/50 text-sm mb-8">
           Edit the default world configuration. Changes apply the next time a player joins.
         </p>
+
+        <div className="mb-6">
+          <ToolIndicator activeTool={activeTool} onSelect={setActiveTool} />
+        </div>
 
         <div className="rounded-3xl bg-white/[0.06] backdrop-blur-xl border border-white/10 p-8 space-y-5">
           {FIELDS.map((f) => (
@@ -141,11 +150,21 @@ export default function Editor() {
         </div>
 
         <div className="mt-6">
-          <CollectiblePlacer collectibles={collectibles} onChange={setCollectibles} />
+          <CollectiblePlacer
+            collectibles={collectibles}
+            onChange={setCollectibles}
+            active={activeTool === 'collectible'}
+            onSelect={() => setActiveTool('collectible')}
+          />
         </div>
 
         <div className="mt-6">
-          <JumpPadPlacer pads={pads} onChange={setPads} />
+          <JumpPadPlacer
+            pads={pads}
+            onChange={setPads}
+            active={activeTool === 'jumppad'}
+            onSelect={() => setActiveTool('jumppad')}
+          />
         </div>
 
         <div className="mt-6">
