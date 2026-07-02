@@ -6,6 +6,7 @@ import { ArrowLeft, Save, Check } from 'lucide-react';
 import CollectiblePlacer from '@/components/editor/CollectiblePlacer';
 import JumpPadPlacer from '@/components/editor/JumpPadPlacer';
 import ObstacleCoursePicker from '@/components/editor/ObstacleCoursePicker';
+import QuickLoadMenu from '@/components/editor/QuickLoadMenu';
 
 const FIELDS = [
   { key: 'name', label: 'World name', type: 'text' },
@@ -28,6 +29,8 @@ export default function Editor() {
   const [pads, setPads] = useState([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [applyingId, setApplyingId] = useState(null);
+  const [appliedId, setAppliedId] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -61,6 +64,29 @@ export default function Editor() {
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  // Quick load: replace the baseplate layout with a preset and save instantly.
+  const quickApply = async (course) => {
+    setApplyingId(course.id);
+    const nextParts = [...(course.parts || [])];
+    const nextPads = [...(course.pads || [])];
+    setParts(nextParts);
+    setPads(nextPads);
+    const payload = {};
+    for (const f of FIELDS) {
+      payload[f.key] = f.type === 'number' ? Number(form[f.key]) || 0 : form[f.key];
+    }
+    payload.collectibles = collectibles;
+    payload.parts = [...nextParts, ...nextPads];
+    if (recordId) await base44.entities.WorldConfig.update(recordId, payload);
+    else {
+      const rec = await base44.entities.WorldConfig.create(payload);
+      setRecordId(rec.id);
+    }
+    setApplyingId(null);
+    setAppliedId(course.id);
+    setTimeout(() => setAppliedId(null), 2000);
   };
 
   const loadCourse = (course) => {
@@ -120,6 +146,10 @@ export default function Editor() {
 
         <div className="mt-6">
           <JumpPadPlacer pads={pads} onChange={setPads} />
+        </div>
+
+        <div className="mt-6">
+          <QuickLoadMenu onApply={quickApply} applyingId={applyingId} appliedId={appliedId} />
         </div>
 
         <div className="mt-6">
